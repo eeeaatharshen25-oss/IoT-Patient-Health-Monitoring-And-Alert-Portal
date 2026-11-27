@@ -136,4 +136,5 @@ AD8232
 
 Records electrical heart activity
 
+[▶ Watch Project Demo Video](https://drive.google.com/file/d/1DLIFIsH95hvGZ3HAr7CtV3GIRV1HATDz/view?usp=drivesdk)
 
