@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Patients · CareMonitor{% endblock %}
+{% block content %}
+<section class="heading"><div><p class="eyebrow">PATIENT DIRECTORY</p><h1>Patients</h1><p class="muted">Create and view local demo patient records.</p></div></section>
+<section class="panel"><h2>Add patient</h2>
+<form method="post" class="form-grid patient-form">
+  <label>Name<input name="name" maxlength="100" required placeholder="Full name"></label>
+  <label>Age<input name="age" type="number" min="0" max="130" placeholder="Age"></label>
+  <label>Notes<input name="notes" maxlength="300" placeholder="Optional notes"></label>
+  <button class="button" type="submit">Add patient</button>
+</form></section>
+<section class="panel"><h2>Registered patients</h2><div class="table-wrap"><table>
+<thead><tr><th>ID</th><th>Name</th><th>Age</th><th>Notes</th><th></th></tr></thead><tbody>
+{% for p in patients %}<tr><td>{{ p.id }}</td><td>{{ p.name }}</td><td>{{ p.age if p.age is not none else "—" }}</td><td>{{ p.notes or "—" }}</td><td><a href="{{ url_for('dashboard', patient_id=p.id) }}">Open dashboard</a></td></tr>
+{% else %}<tr><td colspan="5">No patients added.</td></tr>{% endfor %}
+</tbody></table></div></section>
+{% endblock %}

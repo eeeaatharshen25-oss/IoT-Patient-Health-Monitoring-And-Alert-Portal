@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · CareMonitor{% endblock %}
+{% block content %}
+<section class="heading">
+  <div><p class="eyebrow">REMOTE PATIENT CARE</p><h1>Patient monitoring</h1><p class="muted">View sensor readings and configured demo alerts.</p></div>
+  <a class="button secondary" href="{{ url_for('patients') }}">Manage patients</a>
+</section>
+{% if patients %}
+<div class="toolbar">
+  <label for="patientSelect">Patient</label>
+  <select id="patientSelect" onchange="location.href='/?patient_id='+this.value">
+    {% for p in patients %}<option value="{{ p.id }}" {% if patient and p.id == patient.id %}selected{% endif %}>{{ p.name }} · #{{ p.id }}</option>{% endfor %}
+  </select>
+  <span class="live">● Auto refresh every 5 seconds</span>
+</div>
+{% if patient %}
+<div id="monitor" data-patient-id="{{ patient.id }}">
+  <section class="metrics">
+    <article class="metric"><p>Heart rate</p><strong id="heartRate">{{ latest.heart_rate if latest and latest.heart_rate is not none else "—" }}</strong><small>bpm</small></article>
+    <article class="metric"><p>SpO₂</p><strong id="spo2">{{ latest.spo2 if latest and latest.spo2 is not none else "—" }}</strong><small>%</small></article>
+    <article class="metric"><p>Temperature</p><strong id="temperature">{{ latest.temperature if latest and latest.temperature is not none else "—" }}</strong><small>°C</small></article>
+  </section>
+  <p class="muted small">Last received: <span id="recordedAt">{{ latest.recorded_at if latest else "No readings yet" }}</span></p>
+</div>
+<section class="panel">
+  <h2>Test the dashboard</h2>
+  <p class="muted small">Manual demo values only. They are not measured patient data.</p>
+  <form class="form-grid" method="post" action="{{ url_for('demo_reading') }}">
+    <input type="hidden" name="patient_id" value="{{ patient.id }}">
+    <label>Heart rate (bpm)<input type="number" name="heart_rate" min="0" max="300" value="76" required></label>
+    <label>SpO₂ (%)<input type="number" name="spo2" min="0" max="100" value="98" required></label>
+    <label>Temperature (°C)<input type="number" name="temperature" min="0" max="60" step="0.1" value="36.8" required></label>
+    <button class="button" type="submit">Save demo reading</button>
+  </form>
+</section>
+{% endif %}
+{% else %}<div class="empty">No patients yet. Add a patient to begin.</div>{% endif %}
+<section class="columns">
+  <article class="panel"><h2>Recent alerts</h2>
+    {% if alerts %}<ul class="alerts">{% for a in alerts %}<li><b>{{ a.patient_name }}</b><span>{{ a.message }}</span><small>{{ a.created_at }}</small></li>{% endfor %}</ul>
+    {% else %}<p class="muted">No alerts recorded.</p>{% endif %}
+  </article>
+  <article class="panel"><h2>Reading history</h2>
+    {% if history %}<div class="table-wrap"><table><thead><tr><th>Time</th><th>HR</th><th>SpO₂</th><th>Temp</th></tr></thead><tbody>
+    {% for r in history %}<tr><td>{{ r.recorded_at[:19].replace("T", " ") }}</td><td>{{ r.heart_rate if r.heart_rate is not none else "—" }}</td><td>{{ r.spo2 if r.spo2 is not none else "—" }}</td><td>{{ r.temperature if r.temperature is not none else "—" }}</td></tr>{% endfor %}
+    </tbody></table></div>{% else %}<p class="muted">No readings received yet.</p>{% endif %}
+  </article>
+</section>
+<div class="notice"><b>Safety:</b> Alert ranges are illustrative software settings, not clinically validated limits. This prototype is not a medical device.</div>
+{% endblock %}
